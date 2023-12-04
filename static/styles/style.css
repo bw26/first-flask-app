@@ -20,6 +20,19 @@ body {
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
+.dark-mode{
+
+    font-family: Lato, sans-serif;
+
+    /* fallback for old browsers */
+
+    background: -webkit-linear-gradient(to right, #303231, #0f0548);
+
+    /* Chrome 10-25, Safari 5.1-6 */
+
+    background: linear-gradient(to right, #303231, #0f0548);
+}
+
 #title {
     margin-top: 5px;
 
@@ -278,6 +291,10 @@ form {
 }
 
 /*Log Out*/
+#dark_btn{
+    float: left;
+    text-align: center;
+}
 #logout_btn{
     float: right;
     text-align: center;

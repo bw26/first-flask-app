@@ -120,3 +120,7 @@ function validate() {
 function logout(){
   window.location = "login";
 }
+
+function toggleDarkMode(){
+  document.body.classList.toggle("dark-mode");
+}
