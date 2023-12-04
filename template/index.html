@@ -1,0 +1,51 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>To-do list</title>
+
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/style.css') }}" />
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="section1">
+        <h1 id="title">TO DO LIST</h1>
+
+        <p>
+          <label for="new-task">Add Tasks</label>
+
+          <input id="new-task" type="text" />
+
+          <button onclick="addTask()">Add</button>
+        </p>
+      </div>
+
+      <div class="section2">
+        <h3>To-do</h3>
+
+        <ul id="incomplete-tasks"></ul>
+
+        <button class="markAll" , onclick="markAllTasksDone()">
+          Mark All Done
+        </button>
+      </div>
+
+      <div class="section3">
+        <h3>Completed Tasks</h3>
+
+        <ul id="completed-tasks"></ul>
+      </div>
+
+      <div class="section4">
+        <button id="clear" , onclick="clearAllTasks()">
+          <p>Clear</p>
+        </button>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static',filename='app.js') }}"></script>
+  </body>
+</html>
