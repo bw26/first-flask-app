@@ -225,7 +225,7 @@ ul li.editMode label {
 /*Login Style*/
 .login_container {
     align-items: center;
-    margin-top: 15%;
+    margin-top: 10%;
 }
 
 .login_box {
@@ -275,4 +275,10 @@ form {
     margin-top: 10%;
     padding: 10px;
     font-size: 20px;
+}
+
+/*Log Out*/
+#logout_btn{
+    float: right;
+    text-align: center;
 }

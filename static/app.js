@@ -94,21 +94,29 @@ function validate() {
   var password = document.getElementById("password").value;
 
   fetch("static/passwords.txt")
-  .then((res) => res.text())
-  .then((text) => {
-    // do something with "text"
-    var creds = text.split("\n");
-    creds.forEach((line) =>{
-      var cred = line.split(",");
-      if(username == cred[0].trim() && password == cred[1].trim()){
-        console.log(username)
-        console.log(cred[0].trim())
-        console.log(password)
-        console.log(cred[1].trim())
-        window.location = "home";
-        return;
-      }
+    .then((res) => res.text())
+    .then((text) => {
+      var creds = text.split("\n");
+      var notFound = true;
+      creds.forEach((line) => {
+        var cred = line.split(",");
+        if (username == cred[0].trim() && password == cred[1].trim()) {
+          console.log(username);
+          console.log(cred[0].trim());
+          console.log(password);
+          console.log(cred[1].trim());
+          window.location = "home";
+          notFound = false;
+          return;
+        }
+      });
+      if (notFound) alert("Incorrect Login Credentials.");
+      document.getElementById("user_name").value = ""
+      document.getElementById("password").value = ""
     })
-   })
-  .catch((e) => console.error(e));
+    .catch((e) => console.error(e));
+}
+
+function logout(){
+  window.location = "login";
 }
