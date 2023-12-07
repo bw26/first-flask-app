@@ -6,14 +6,17 @@
 
     <title>To-do list</title>
 
-    <link rel="stylesheet" href="{{ url_for('static',filename='styles/style.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='styles/style.css') }}"
+    />
   </head>
 
   <body>
     <div class="container">
       <div class="task_bar">
-        <button id="dark_btn" onclick="toggleDarkMode()"> Dark Mode </button>
-        <button id="logout_btn" onclick="logout()"> Log Out </button>
+        <button id="dark_btn" onclick="toggleDarkMode()">Dark Mode</button>
+        <button id="logout_btn" onclick="logout()">Log Out</button>
       </div>
       <div class="section1">
         <h1 id="title">TO DO LIST</h1>
@@ -24,13 +27,33 @@
           <input id="new-task" type="text" />
 
           <button onclick="addTask()">Add</button>
+          <input type="file" accept=".xls,.xlsx" id="uploadTaskFile" />
+          <button id="import_btn" onclick="importFile()">Import</button>
         </p>
       </div>
 
       <div class="section2">
         <h3>To-do</h3>
-
-        <ul id="incomplete-tasks"></ul>
+        <table id="incomplete-tasks">
+          <tr>
+            <th></th>
+            {% for column in incomplete_task_columns %}
+            <th>{{ column }}</th>
+            {% endfor %}
+            <th></th>
+            <th></th>
+          </tr>
+          {% for row in incomplete_task_data %}
+          <tr>
+            <td><input name="row_checkbox" type="checkbox" onclick="isBoxChecked(this)"/></td>
+            {% for value in row %}
+            <td>{{ value }}</td>
+            {% endfor %}
+            <td><button class="incomplete-edit-button" onclick="editTask(this)">Edit</button></td>
+            <td><button id="incomplete-delete-button" onclick="deleteTask(this)">Delete</button></td>
+          </tr>
+          {% endfor %}
+        </table>
 
         <button class="markAll" , onclick="markAllTasksDone()">
           Mark All Done
@@ -39,8 +62,26 @@
 
       <div class="section3">
         <h3>Completed Tasks</h3>
-
-        <ul id="completed-tasks"></ul>
+        <table id="completed-tasks">
+          <tr>
+            <th></th>
+            {% for column in complete_task_columns %}
+            <th>{{ column }}</th>
+            {% endfor %}
+            <th></th>
+            <th></th>
+          </tr>
+          {% for row in complete_task_data %}
+          <tr>
+            <td></td>
+            {% for value in row %}
+            <td>{{ value }}</td>
+            {% endfor %}
+            <td><button class="complete-edit-button" onclick="editTask(this)">Edit</button></td>
+            <td><button class="complete-delete-button" onclick="deleteTask(this)">Delete</button></td>
+          </tr>
+          {% endfor %}
+        </table>
       </div>
 
       <div class="section4">

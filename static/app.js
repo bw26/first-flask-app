@@ -1,126 +1,290 @@
-function addProperties(new_item) {
-  var text = document.createElement("input");
-  text.type = "text";
-  new_item.appendChild(text);
-  var edit = document.createElement("button");
-  edit.innerHTML = "Edit";
-  edit.setAttribute("onclick", "editTask(this)");
-  edit.className = "edit";
-  new_item.appendChild(edit);
-  var del = document.createElement("button");
-  del.innerHTML = "Delete";
-  del.setAttribute("onclick", "deleteTask(this)");
-  del.className = "delete";
-  new_item.appendChild(del);
-  return new_item;
-}
-
+/*
+  Add Task:
+  Event Listener for 'Add' Button
+  Sends a POST request to API to insert new row into incomplete table in MySQL database.
+*/
 function addTask() {
+  const url = "http://127.0.0.1:5000/api/incomplete";
   var taskInput = document.getElementById("new-task");
   if (taskInput.value.trim() != "") {
-    var list = document.getElementById("incomplete-tasks");
-
-    var new_item = document.createElement("li");
-    var checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = "";
-    checkbox.setAttribute("onclick", "isBoxChecked(this)");
-    new_item.appendChild(checkbox);
-    var label = document.createElement("label");
-    label.innerHTML = taskInput.value;
-    new_item.appendChild(label);
-    new_item = addProperties(new_item);
-
-    list.appendChild(new_item);
-    taskInput.value = "";
+    var properties = taskInput.value.split(",");
+    if(properties.length < 6){
+      alert("Incorrect Input Format")
+      return;
+    }
+    var task_name = properties[0].trim();
+    var date_created = properties[1].trim();
+    var date_completed = properties[2].trim();
+    var completion_status = properties[3].trim();
+    var priority = properties[4].trim();
+    var time_to_complete = properties[5].trim();
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "task_name": task_name,
+        "date_created": date_created,
+        "date_completed": date_completed,
+        "completion_status": completion_status,
+        "priority": priority,
+        "time_to_complete": time_to_complete
+      })
+    })
+      .then(response => {
+        if(!response.ok){
+          alert("Unable to Add Task")
+        }
+        else window.location = "home"
+      })
   }
 }
 
+/*
+  Check if checkbox is checked:
+  Event Listener for Checkboxes
+  If box is checked, send a DELETE request to API to remove row from incomplete table and 
+  a POST request to insert new row into complete table in MySQL database.
+*/
 function isBoxChecked(element) {
+  console.log("HI")
   if (element.checked == true) {
-    deleteTask(element);
-    var completed = document.getElementById("completed-tasks");
-    var new_item = document.createElement("li");
-    var label = document.createElement("label");
-    label.innerHTML =
-      element.parentNode.getElementsByTagName("label")[0].innerHTML;
-    new_item.appendChild(label);
-    new_item = addProperties(new_item);
-
-    completed.appendChild(new_item);
+    const url = "http://127.0.0.1:5000/api/complete";
+    var row = element.parentNode.parentNode;
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "taskid" : row.cells[1].innerHTML,
+        "task_name": row.cells[2].innerHTML,
+        "date_created": row.cells[3].innerHTML,
+        "date_completed": row.cells[4].innerHTML,
+        "completion_status": row.cells[5].innerHTML,
+        "priority": row.cells[6].innerHTML,
+        "time_to_complete": row.cells[7].innerHTML
+      })
+    })
+      .then(response => {
+        if(!response.ok){
+          alert("Unable to Move Task to Completed")
+        }
+        else {
+          deleteTask(element);
+          window.location = "home"
+        }
+      })
   }
 }
 
+/*
+  Edit Task:
+  Event Listener for 'Edit' Button
+  Sends a PUT request to API to update row in table in MySQL database.
+*/
 function editTask(element) {
   var input = prompt("Edit your entry");
   var entry = element.parentNode.getElementsByTagName("label")[0];
   entry.innerHTML = input;
 }
 
+/*
+  Delete Task:
+  Event Listener for 'Delete' Button
+  Sends a DELETE request to API to remove row from table in MySQL database.
+*/
 function deleteTask(element) {
-  var list = element.parentNode.parentNode;
-  var li = element.parentNode;
-  list.removeChild(li);
+  var url;
+  var table = element.parentNode.parentNode.parentNode.parentNode;
+  console.log(table.id);//not getting table.id
+  if(table.id === 'incomplete-tasks'){
+    url = "http://127.0.0.1:5000/api/incomplete";
+  }
+  else if (table.id === 'completed-tasks'){
+    url = "http://127.0.0.1:5000/api/complete";
+  }
+  var row = element.parentNode.parentNode;
+  var taskid = row.cells[1].innerHTML
+  fetch(url, {
+    method: "DELETE",
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      "taskid": taskid
+    })
+  })
+    .then(response => {
+      if(!response.ok){
+        alert("Unable to Delete Task")
+      }
+      else window.location = "home"
+    })
 }
 
+/*
+  Mark All Task as Done:
+  Event Listener for 'Mark All Done' Button
+  Sends a POST request to API to add all rows in incomplete table to complete table,
+  and clear incomplete table in MySQL database.
+*/
 function markAllTasksDone() {
-  var current_tasks = document.querySelectorAll("#incomplete-tasks li");
-  var completed = document.getElementById("completed-tasks");
-  Array.from(current_tasks).forEach((listItem) => {
-    listItem.parentNode.removeChild(listItem);
-    var new_item = document.createElement("li");
-    var label = document.createElement("label");
-    label.innerHTML = listItem.getElementsByTagName("label")[0].innerHTML;
-    new_item.appendChild(label);
-    new_item = addProperties(new_item);
+  const url = "http://127.0.0.1:5000/api/complete";
+  var table = document.getElementById("incomplete-tasks")
+  var rows = table.rows;
 
-    completed.appendChild(new_item);
-  });
-}
-function clearAllTasks() {
-  var incompleted = document.querySelectorAll("#incomplete-tasks li");
-  Array.from(incompleted).forEach((listItem) => {
-    listItem.parentNode.removeChild(listItem);
-  });
-  var completed = document.querySelectorAll("#completed-tasks li");
-  Array.from(completed).forEach((listItem) => {
-    listItem.parentNode.removeChild(listItem);
-  });
-}
-
-// Login Validation
-function validate() {
-  var username = document.getElementById("user_name").value;
-  var password = document.getElementById("password").value;
-
-  fetch("static/passwords.txt")
-    .then((res) => res.text())
-    .then((text) => {
-      var creds = text.split("\n");
-      var notFound = true;
-      creds.forEach((line) => {
-        var cred = line.split(",");
-        if (username == cred[0].trim() && password == cred[1].trim()) {
-          console.log(username);
-          console.log(cred[0].trim());
-          console.log(password);
-          console.log(cred[1].trim());
-          window.location = "home";
-          notFound = false;
+  for (var i = 1; i < rows.length; i++) {
+    var row = rows[i]
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        "taskid" : row.cells[1].innerHTML,
+        "task_name": row.cells[2].innerHTML,
+        "date_created": row.cells[3].innerHTML,
+        "date_completed": row.cells[4].innerHTML,
+        "completion_status": row.cells[5].innerHTML,
+        "priority": row.cells[6].innerHTML,
+        "time_to_complete": row.cells[7].innerHTML
+      })
+    })
+      .then(response => {
+        if(!response.ok){
+          alert("Unable to Move Task to Completed")
           return;
         }
-      });
-      if (notFound) alert("Incorrect Login Credentials.");
-      document.getElementById("user_name").value = ""
-      document.getElementById("password").value = ""
+      })
+  }
+  const incomplete_url = "http://127.0.0.1:5000/api/incomplete/clear";
+  fetch(incomplete_url, {
+    method: "POST"
+  })
+    .then(response => {
+      if(!response.ok){
+        alert("Unable to Move Task to Completed")
+        return;
+      }
+      window.location = "home"
     })
-    .catch((e) => console.error(e));
 }
 
-function logout(){
-  window.location = "login";
+/*
+  Clear All Task:
+  Event Listener for 'Clear' Button
+  Sends a request to API to clear incomplete and complete tables in MySQL database.
+*/
+function clearAllTasks() {
+  const url = "http://127.0.0.1:5000/api/clear";
+  fetch(url, {
+    method: "POST"
+  })
+    .then(response => {
+      if(!response.ok){
+        alert("Unable to Clear Tasks")
+      }
+      else {
+        window.location = "home"
+      }
+    })
 }
 
-function toggleDarkMode(){
+/*
+  Login Validation:
+  Event Listener for 'Login' Button
+  Sends a POST request to API to validate credentials in MySQL database.
+*/
+function validate() {
+  const url = "http://127.0.0.1:5000/login";
+  var username = document.getElementById("user_name");
+  var password = document.getElementById("password");
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ "username": username.value, 
+                           "password": password.value })
+  })
+    .then(response => {
+      if(!response.ok){
+        alert("Invalid Login Credentials")
+        username.value=""
+        password.value=""
+      }
+      else window.location = "home"
+    })
+}
+
+/*
+  Log Out:
+  Event Listener for 'Log Out' Button
+  Sends a GET request to API to go back to Login page.
+*/
+function logout() {
+  const export_url = "http://127.0.0.1:5000/api/export";
+  fetch(export_url, {method: "GET"})
+  const url = "http://127.0.0.1:5000/login";
+  fetch(url, {method: "GET"})
+  .then(response => {
+    if(response.ok) window.location = "login"
+  })
+}
+
+/*
+  Toggle Dark Mode:
+  Event Listener for 'Dark Mode' Button
+  Changes page to dark mode
+*/
+function toggleDarkMode() {
   document.body.classList.toggle("dark-mode");
+  document.getElementsByTagName("table").classList.toggle("dark-mode");
+  document.getElementsByTagName("th").classList.toggle("dark-mode");
+  document.getElementsByTagName("td").classList.toggle("dark-mode");
+}
+
+/*
+  Import file:
+  Event Listener for 'Import' Button
+  Imports file into database
+*/
+function importFile() {
+  var file = document.getElementById("uploadTaskFile").files[0];
+  if (!file) {
+    alert("Invalid File");
+    return;
+  }
+  console.log(file);
+}
+
+/* 
+  Requests 
+  some requests
+*/
+function getIncomplete() {
+  const url = "http://127.0.0.1:5000/api/incomplete";
+  fetch(url)
+    .then((response) => response.json())
+    .then((json) => {
+      console.log(json);
+      return json;
+    });
+}
+function getComplete() {
+  const url = "http://127.0.0.1:5000/api/complete";
+  fetch(url)
+    .then((response) => response.json())
+    .then((json) => {
+      console.log(json);
+      return json;
+    });
 }

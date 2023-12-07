@@ -20,18 +20,21 @@ body {
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
-.dark-mode{
+/*Dark Mode*/
+.dark-mode {
 
     font-family: Lato, sans-serif;
 
-    /* fallback for old browsers */
-
-    background: -webkit-linear-gradient(to right, #303231, #0f0548);
-
-    /* Chrome 10-25, Safari 5.1-6 */
-
-    background: linear-gradient(to right, #303231, #0f0548);
+    background: black
 }
+.dark-mode table{
+    color: black;
+    background-color: #119fd3;
+}
+.dark-mode th, td{
+    border: 1px solid rgb(0, 0, 0);
+}
+
 
 #title {
     margin-top: 5px;
@@ -291,11 +294,33 @@ form {
 }
 
 /*Log Out*/
-#dark_btn{
+#dark_btn {
     float: left;
     text-align: center;
 }
-#logout_btn{
+
+#logout_btn {
     float: right;
     text-align: center;
+}
+
+/*Upload File*/
+#import_btn{
+    float: right;
+}
+
+/*Tables*/
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 5px;
+    color: white;
+    background-color: #54049b;
+    font-size: 12;
+    margin: auto;
+}
+th, td {
+    border: 1px solid rgb(187, 10, 163);
+    text-align: center;
+    padding: 4px;
 }
