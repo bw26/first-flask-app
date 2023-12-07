@@ -109,6 +109,7 @@ function deleteTask(element) {
   }
   var row = element.parentNode.parentNode;
   var taskid = row.cells[1].innerHTML
+  console.log(taskid);
   fetch(url, {
     method: "DELETE",
     headers: {
@@ -258,12 +259,25 @@ function toggleDarkMode() {
   Imports file into database
 */
 function importFile() {
+  const url = "http://127.0.0.1:5000/api/upload"
   var file = document.getElementById("uploadTaskFile").files[0];
   if (!file) {
     alert("Invalid File");
     return;
   }
-  console.log(file);
+  var formData = new FormData();
+  formData.append('file', file);
+  fetch(url, {
+    method: 'POST',
+    body: formData,
+  })
+  .then(response => {
+      if(!response.ok){
+        alert("Unable to Upload File")
+      }
+      else window.location = "home"
+  })
+  .catch(error => console.error('Fetch error:', error));
 }
 
 /* 
